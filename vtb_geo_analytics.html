@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ВТБ ГеоАналитика | Сервис для бизнеса</title>
+    <link href="https://fonts.googleapis.com/css2?family=VTB+SS&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vtb-blue: #002882;
+            --vtb-blue-light: #003BB5;
+            --vtb-blue-dark: #001A5C;
+            --vtb-red: #EF3124;
+            --vtb-red-hover: #D4281B;
+            --vtb-gray: #F5F7FA;
+            --vtb-gray-dark: #6B7280;
+            --vtb-text: #1F2937;
+            --vtb-success: #10B981;
+            --vtb-warning: #F59E0B;
+            --hex-size: 40px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E8ECF1 100%);
+            color: var(--vtb-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: var(--shadow-md);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--vtb-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--vtb-blue);
+        }
+
+        .logo-text span {
+            color: var(--vtb-gray-dark);
+            font-weight: 400;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--vtb-gray-dark);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background: var(--vtb-gray);
+            color: var(--vtb-blue);
+        }
+
+        .nav-tab.active {
+            background: var(--vtb-blue);
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--vtb-blue-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 64px;
+            padding: 24px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--vtb-gray-dark);
+            font-size: 14px;
+        }
+
+        /* Map Section */
+        .map-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .map-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--vtb-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 13px;
+            color: var(--vtb-gray-dark);
+            font-weight: 500;
+        }
+
+        .select-input {
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: var(--vtb-blue);
+            box-shadow: 0 0 0 3px rgba(0, 40, 130, 0.1);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--vtb-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--vtb-blue-light);
+        }
+
+        .btn-secondary {
+            background: var(--vtb-gray);
+            color: var(--vtb-text);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-success {
+            background: var(--vtb-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-red {
+            background: var(--vtb-red);
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: var(--vtb-red-hover);
+        }
+
+        .map-canvas {
+            height: 600px;
+            background: linear-gradient(180deg, #E8F4FD 0%, #F0F9FF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hex-grid {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .hex {
+            position: absolute;
+            width: var(--hex-size);
+            height: calc(var(--hex-size) * 1.155);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hex::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: inherit;
+            clip-path: inherit;
+            opacity: 0.8;
+        }
+
+        .hex:hover {
+            transform: scale(1.15);
+            z-index: 100;
+            filter: brightness(1.1);
+        }
+
+        .hex.selected {
+            transform: scale(1.2);
+            z-index: 101;
+            filter: brightness(1.2);
+            box-shadow: 0 0 20px rgba(0, 40, 130, 0.5);
+        }
+
+        .hex-inner {
+            position: relative;
+            z-index: 2;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+        }
+
+        .legend-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--vtb-gray-dark);
+            margin-bottom: 12px;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .legend-label {
+            font-size: 12px;
+            color: var(--vtb-text);
+        }
+
+        /* Hex Info Panel */
+        .hex-info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-xl);
+            z-index: 100;
+            min-width: 280px;
+            display: none;
+        }
+
+        .hex-info-panel.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hex-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--vtb-gray);
+        }
+
+        .hex-info-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+        }
+
+        .hex-info-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--vtb-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--vtb-gray-dark);
+        }
+
+        .hex-info-close:hover {
+            background: #E5E7EB;
+        }
+
+        .metric-card {
+            background: var(--vtb-gray);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .metric-name {
+            font-size: 12px;
+            color: var(--vtb-gray-dark);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .metric-trend.up {
+            color: var(--vtb-success);
+        }
+
+        .metric-trend.down {
+            color: var(--vtb-red);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 24px;
+        }
+
+        .stat-icon.blue {
+            background: rgba(0, 40, 130, 0.1);
+            color: var(--vtb-blue);
+        }
+
+        .stat-icon.red {
+            background: rgba(239, 49, 36, 0.1);
+            color: var(--vtb-red);
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--vtb-success);
+        }
+
+        .stat-icon.orange {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--vtb-warning);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--vtb-gray-dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--vtb-text);
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .stat-change.positive {
+            color: var(--vtb-success);
+        }
+
+        .stat-change.negative {
+            color: var(--vtb-red);
+        }
+
+        /* Promo Section */
+        .promo-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--vtb-red);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .promo-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--vtb-text);
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--vtb-blue);
+            box-shadow: 0 0 0 3px rgba(0, 40, 130, 0.1);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--vtb-gray-dark);
+        }
+
+        .promo-summary {
+            background: linear-gradient(135deg, var(--vtb-blue) 0%, var(--vtb-blue-light) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .summary-total {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-total-label {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .summary-total-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--vtb-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--vtb-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--vtb-gray-dark);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid var(--vtb-gray);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Compliance Badge */
+        .compliance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--vtb-success);
+            font-weight: 600;
+        }
+
+        .compliance-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Advantage Cards */
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .advantage-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--vtb-blue);
+        }
+
+        .advantage-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--vtb-blue);
+            margin-bottom: 8px;
+        }
+
+        .advantage-desc {
+            font-size: 14px;
+            color: var(--vtb-gray-dark);
+            line-height: 1.5;
+        }
+
+        /* Unit Economics */
+        .economics-section {
+            background: linear-gradient(135deg, var(--vtb-blue-dark) 0%, var(--vtb-blue) 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .economics-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .economics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .econ-item {
+            text-align: center;
+        }
+
+        .econ-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .econ-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-xl);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--vtb-success);
+        }
+
+        .toast-message {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 16px;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .map-canvas {
+                height: 400px;
+            }
+
+            .hex-info-panel {
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                border-radius: 16px 16px 0 0;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">В</div>
+                <div class="logo-text">ВТБ <span>ГеоАналитика</span></div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="map">📊 Карта аналитики</button>
+                <button class="nav-tab" data-tab="promo">🎯 Промо-кампании</button>
+                <button class="nav-tab" data-tab="advantages">💡 Преимущества</button>
+            </nav>
+            <div class="header-actions">
+                <div class="compliance-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    152-ФЗ / 98-ФЗ
+                </div>
+                <div class="user-avatar">ИП</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header" id="pageHeader">
+            <h1 class="page-title">Карта клиентской активности</h1>
+            <p class="page-subtitle">Аналитика по гексам на основе анонимизированных транзакций клиентов ВТБ</p>
+        </div>
+
+        <!-- Map Section -->
+        <div class="map-container" id="mapSection">
+            <div class="map-header">
+                <div class="map-controls">
+                    <div class="control-group">
+                        <label class="control-label">Категория:</label>
+                        <select class="select-input" id="categorySelect">
+                            <option value="retail">Розничная торговля</option>
+                            <option value="food">Общественное питание</option>
+                            <option value="services">Услуги</option>
+                            <option value="entertainment">Развлечения</option>
+                            <option value="health">Здоровье и красота</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Период:</label>
+                        <select class="select-input" id="periodSelect">
+                            <option value="month">Последний месяц</option>
+                            <option value="quarter">Квартал</option>
+                            <option value="halfyear">Полгода</option>
+                            <option value="year">Год</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Размер гекса:</label>
+                        <select class="select-input" id="hexSizeSelect">
+                            <option value="400">400 м</option>
+                            <option value="900">900 м</option>
+                            <option value="2400">2.4 км</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    🔄 Обновить данные
+                </button>
+            </div>
+
+            <div class="map-canvas" id="mapCanvas">
+                <div class="hex-grid" id="hexGrid"></div>
+                
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-title">Индекс активного интереса</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #002882;"></div>
+                            <span class="legend-label">Высокий (>1.5)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #003BB5;"></div>
+                            <span class="legend-label">Средний (1.0-1.5)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4A90E2;"></div>
+                            <span class="legend-label">Низкий (0.5-1.0)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #B8D4F5;"></div>
+                            <span class="legend-label">Минимальный (<0.5)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hex Info Panel -->
+                <div class="hex-info-panel" id="hexInfoPanel">
+                    <div class="hex-info-header">
+                        <div class="hex-info-title" id="hexTitle">Гекс #127</div>
+                        <button class="hex-info-close" onclick="closeHexPanel()">×</button>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">Индекс активного интереса</div>
+                        <div class="metric-value" id="metricInterest">1.42</div>
+                        <div class="metric-trend up" id="trendInterest">↑ +12% к городу</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">ATV Индекс (средний чек)</div>
+                        <div class="metric-value" id="metricAtv">1.18</div>
+                        <div class="metric-trend up" id="trendAtv">↑ Выше среднего</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">Индекс постоянника</div>
+                        <div class="metric-value" id="metricLoyalty">3.2</div>
+                        <div class="metric-trend" id="trendLoyalty">визитов/клиент</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-name">Доля рынка в гексе</div>
+                        <div class="metric-value" id="metricShare">34%</div>
+                        <div class="metric-trend up" id="trendShare">↑ +5% за период</div>
+                    </div>
+                    <button class="btn btn-red" style="width: 100%; margin-top: 12px;" onclick="openPromoFromHex()">
+                        🎯 Создать промо-кампанию для этого гекса
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon blue">📍</div>
+                <div class="stat-label">Активных гексов</div>
+                <div class="stat-value" id="activeHexes">2,847</div>
+                <div class="stat-change positive">↑ 127 за месяц</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">🛒</div>
+                <div class="stat-label">Транзакций проанализировано</div>
+                <div class="stat-value" id="totalTransactions">1.2M</div>
+                <div class="stat-change positive">↑ 8.3% к прошлому месяцу</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">👥</div>
+                <div class="stat-label">Уникальных клиентов ВТБ</div>
+                <div class="stat-value" id="uniqueClients">485K</div>
+                <div class="stat-change positive">↑ 12.1% за квартал</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">📈</div>
+                <div class="stat-label">Средний индекс интереса</div>
+                <div class="stat-value" id="avgInterest">1.23</div>
+                <div class="stat-change positive">↑ 0.15 к городу</div>
+            </div>
+        </div>
+
+        <!-- Promo Section -->
+        <div class="promo-section" id="promoSection" style="display: none;">
+            <div class="section-title">
+                <div class="section-title-icon">🎯</div>
+                Создание промо-кампании
+            </div>
+            <div class="promo-form">
+                <div class="form-group">
+                    <label class="form-label">Выбранный гекс</label>
+                    <input type="text" class="form-input" id="promoHex" value="Гекс #127 (400м)" readonly>
+                    <div class="form-hint">Центр: ул. Ленина, 45</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Категория таргетинга</label>
+                    <select class="form-input" id="promoCategory">
+                        <option value="retail">Розничная торговля</option>
+                        <option value="food">Общественное питание</option>
+                        <option value="services">Услуги</option>
+                        <option value="entertainment">Развлечения</option>
+                        <option value="health">Здоровье и красота</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Период с последней покупки</label>
+                    <select class="form-input" id="promoPeriod">
+                        <option value="30">30 дней</option>
+                        <option value="60">60 дней</option>
+                        <option value="90">90 дней</option>
+                        <option value="180">180 дней</option>
+                        <option value="365">365 дней</option>
+                    </select>
+                    <div class="form-hint">Влияет на стоимость рассылки</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Текст пуш-уведомления</label>
+                    <textarea class="form-input" id="promoText" rows="3" placeholder="Введите текст уведомления (макс. 140 символов)"></textarea>
+                    <div class="form-hint">Пройдет модерацию перед запуском</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Дополнительный бюджет (аукцион)</label>
+                    <input type="number" class="form-input" id="promoBudget" value="0" min="0" step="100" onchange="calculatePromo()">
+                    <div class="form-hint">Увеличивает приоритет в аукционе</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ожидаемый охват</label>
+                    <input type="text" class="form-input" id="promoReach" value="2,450 человек" readonly>
+                </div>
+            </div>
+
+            <div class="promo-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Базовая стоимость (400м)</span>
+                    <span class="summary-value" id="baseCost">4,500 ₽</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Период 30 дней</span>
+                    <span class="summary-value" id="periodCost">2,000 ₽</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Дополнительный бюджет</span>
+                    <span class="summary-value" id="additionalBudget">0 ₽</span>
+                </div>
+                <div class="summary-total">
+                    <span class="summary-total-label">Итого к оплате:</span>
+                    <span class="summary-total-value" id="totalCost">6,500 ₽</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="submitPromo()">
+                    ✅ Отправить на модерацию
+                </button>
+                <button class="btn btn-secondary" onclick="resetPromo()">
+                    🔄 Сбросить
+                </button>
+                <div class="compliance-badge" style="margin-left: auto;">
+                    🔒 Не более 3 уведомлений в неделю
+                </div>
+            </div>
+        </div>
+
+        <!-- Advantages Section -->
+        <div id="advantagesSection" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Конкурентные преимущества</h1>
+                <p class="page-subtitle">Почему ВТБ ГеоАналитика — лучший выбор для вашего бизнеса</p>
+            </div>
+
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="advantage-title">🔄 Динамические данные</div>
+                    <div class="advantage-desc">В отличие от Сбер-аналитики и T-Data, мы показываем не статичную картину, а динамичное изменение клиентского интереса в реальном времени с ежемесячным обновлением.</div>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-title">📊 Глубокая аналитика</div>
+                    <div class="advantage-desc">4 уникальных метрики: Индекс активного интереса, ATV Индекс, Индекс постоянника и Доля рынка — для комплексной оценки потенциала каждой локации.</div>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-title">🎯 Точный таргетинг</div>
+                    <div class="advantage-desc">Единственный инструмент, который не только анализирует, но и предоставляет канал коммуникации с максимально целевой аудиторией через пуш-уведомления.</div>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-title">💰 Для растущего МСП</div>
+                    <div class="advantage-desc">Создан специально для крепкого МСП, а не только для открывающих первую точку. Идеален для выбора точек наружной рекламы и оффлайн промо-акций.</div>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-title">🔒 Полная безопасность</div>
+                    <div class="advantage-desc">Соответствие 152-ФЗ и 98-ФЗ: токенизация, агрегация, добавление шума и использование индексов вместо абсолютных чисел для защиты коммерческой тайны.</div>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-title">🚀 Максимальный ретеншн</div>
+                    <div class="advantage-desc">Совокупность аналитики и прямого канала коммуникации позволяет максимизировать удержание клиентов и открывает новые рынки сбыта.</div>
+                </div>
+            </div>
+
+            <!-- Unit Economics -->
+            <div class="economics-section">
+                <h2 class="economics-title">💼 Юнит-экономика сервиса</h2>
+                <div class="economics-grid">
+                    <div class="econ-item">
+                        <div class="econ-value">20,000 ₽</div>
+                        <div class="econ-label">Целевой LTV</div>
+                    </div>
+                    <div class="econ-item">
+                        <div class="econ-value">3 месяца</div>
+                        <div class="econ-label">Срок окупаемости</div>
+                    </div>
+                    <div class="econ-item">
+                        <div class="econ-value">1,000 ₽</div>
+                        <div class="econ-label">COGS</div>
+                    </div>
+                    <div class="econ-item">
+                        <div class="econ-value">6,700 ₽</div>
+                        <div class="econ-label">ARPU / CAC</div>
+                    </div>
+                    <div class="econ-item">
+                        <div class="econ-value">13.4M ₽</div>
+                        <div class="econ-label">GMV</div>
+                    </div>
+                    <div class="econ-item">
+                        <div class="econ-value">11.4M ₽</div>
+                        <div class="econ-label">NET</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">🏢</div>
+                    <div class="stat-label">Планируемое число клиентов</div>
+                    <div class="stat-value">2,000</div>
+                    <div class="stat-change">Paying Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">💸</div>
+                    <div class="stat-label">Постоянные расходы</div>
+                    <div class="stat-value">2M ₽</div>
+                    <div class="stat-change">Fix Costs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">📊</div>
+                    <div class="stat-label">Маржинальность</div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-change positive">Высокая ценность</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Promo Submission -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Подтверждение отправки</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px;">Вы собираетесь отправить промо-кампанию на модерацию:</p>
+                <div class="metric-card">
+                    <div class="metric-name">Гекс</div>
+                    <div class="metric-value" id="modalHex">Гекс #127</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-name">Ожидаемый охват</div>
+                    <div class="metric-value" id="modalReach">2,450 человек</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-name">Стоимость</div>
+                    <div class="metric-value" id="modalCost">6,500 ₽</div>
+                </div>
+                <p style="margin-top: 16px; font-size: 13px; color: var(--vtb-gray-dark);">
+                    ⚠️ Кампания пройдет обязательную модерацию перед запуском. 
+                    Срок рассмотрения: до 2 рабочих дней.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="confirmPromo()">Подтвердить отправку</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon success">✓</div>
+        <div class="toast-message" id="toastMessage">Данные успешно обновлены!</div>
+    </div>
+
+    <script>
+        // State
+        let selectedHex = null;
+        let currentTab = 'map';
+
+        // Generate hex grid
+        function generateHexGrid() {
+            const grid = document.getElementById('hexGrid');
+            grid.innerHTML = '';
+            
+            const colors = ['#002882', '#003BB5', '#4A90E2', '#B8D4F5'];
+            const hexSize = 40;
+            const hexHeight = hexSize * 1.155;
+            const rows = 12;
+            const cols = 20;
+            
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const hex = document.createElement('div');
+                    hex.className = 'hex';
+                    hex.dataset.id = row * cols + col + 1;
+                    
+                    // Offset every other row
+                    const xOffset = row % 2 === 0 ? 0 : hexSize * 0.75;
+                    const x = col * hexSize * 1.5 + xOffset;
+                    const y = row * hexHeight * 0.9;
+                    
+                    hex.style.left = `${x}px`;
+                    hex.style.top = `${y}px`;
+                    
+                    // Random color based on index
+                    const colorIndex = Math.floor(Math.random() * colors.length);
+                    hex.style.background = colors[colorIndex];
+                    
+                    // Add inner label
+                    const inner = document.createElement('span');
+                    inner.className = 'hex-inner';
+                    inner.textContent = hex.dataset.id;
+                    hex.appendChild(inner);
+                    
+                    hex.addEventListener('click', () => selectHex(hex));
+                    
+                    grid.appendChild(hex);
+                }
+            }
+        }
+
+        // Select hex
+        function selectHex(hex) {
+            // Remove previous selection
+            document.querySelectorAll('.hex.selected').forEach(h => h.classList.remove('selected'));
+            
+            // Add selection
+            hex.classList.add('selected');
+            selectedHex = hex.dataset.id;
+            
+            // Update panel
+            updateHexInfo(selectedHex);
+            
+            // Show panel
+            document.getElementById('hexInfoPanel').classList.add('active');
+        }
+
+        // Update hex info with random data
+        function updateHexInfo(hexId) {
+            document.getElementById('hexTitle').textContent = `Гекс #${hexId}`;
+            
+            const interest = (Math.random() * 1.5 + 0.5).toFixed(2);
+            const atv = (Math.random() * 0.8 + 0.8).toFixed(2);
+            const loyalty = Math.floor(Math.random() * 5 + 1);
+            const share = Math.floor(Math.random() * 40 + 20);
+            
+            document.getElementById('metricInterest').textContent = interest;
+            document.getElementById('metricAtv').textContent = atv;
+            document.getElementById('metricLoyalty').textContent = loyalty.toFixed(1);
+            document.getElementById('metricShare').textContent = share + '%';
+            
+            // Update trends
+            const trends = ['up', 'down', ''];
+            const trendClass = trends[Math.floor(Math.random() * trends.length)];
+            document.getElementById('trendInterest').className = `metric-trend ${trendClass}`;
+            document.getElementById('trendInterest').textContent = trendClass === 'up' ? `↑ +${Math.floor(Math.random() * 20)}% к городу` : trendClass === 'down' ? `↓ -${Math.floor(Math.random() * 10)}% к городу` : 'Без изменений';
+        }
+
+        // Close hex panel
+        function closeHexPanel() {
+            document.getElementById('hexInfoPanel').classList.remove('active');
+            if (selectedHex) {
+                document.querySelector(`.hex[data-id="${selectedHex}"]`).classList.remove('selected');
+                selectedHex = null;
+            }
+        }
+
+        // Open promo from hex
+        function openPromoFromHex() {
+            switchTab('promo');
+            document.getElementById('promoHex').value = `Гекс #${selectedHex} (400м)`;
+            calculatePromo();
+        }
+
+        // Calculate promo cost
+        function calculatePromo() {
+            const baseCost = 4500;
+            const periodMultiplier = {
+                '30': 1.0,
+                '60': 1.3,
+                '90': 1.5,
+                '180': 1.8,
+                '365': 2.0
+            };
+            
+            const period = document.getElementById('promoPeriod').value;
+            const additionalBudget = parseInt(document.getElementById('promoBudget').value) || 0;
+            
+            const periodCost = Math.round(baseCost * 0.45 * periodMultiplier[period]);
+            const total = baseCost + periodCost + additionalBudget;
+            
+            document.getElementById('baseCost').textContent = baseCost.toLocaleString() + ' ₽';
+            document.getElementById('periodCost').textContent = periodCost.toLocaleString() + ' ₽';
+            document.getElementById('additionalBudget').textContent = additionalBudget.toLocaleString() + ' ₽';
+            document.getElementById('totalCost').textContent = total.toLocaleString() + ' ₽';
+            
+            // Update reach
+            const baseReach = 2450;
+            const reachVariation = Math.floor(Math.random() * 500 - 250);
+            document.getElementById('promoReach').value = (baseReach + reachVariation).toLocaleString() + ' человек';
+        }
+
+        // Submit promo
+        function submitPromo() {
+            const text = document.getElementById('promoText').value;
+            if (!text.trim()) {
+                showToast('⚠️ Введите текст уведомления', 'warning');
+                return;
+            }
+            
+            document.getElementById('modalHex').textContent = document.getElementById('promoHex').value;
+            document.getElementById('modalReach').textContent = document.getElementById('promoReach').value;
+            document.getElementById('modalCost').textContent = document.getElementById('totalCost').textContent;
+            
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        // Confirm promo
+        function confirmPromo() {
+            closeModal();
+            showToast('✅ Кампания отправлена на модерацию!', 'success');
+            resetPromo();
+        }
+
+        // Reset promo form
+        function resetPromo() {
+            document.getElementById('promoText').value = '';
+            document.getElementById('promoBudget').value = '0';
+            document.getElementById('promoPeriod').value = '30';
+            calculatePromo();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Refresh data
+        function refreshData() {
+            showToast('🔄 Данные обновлены!');
+            generateHexGrid();
+            
+            // Update stats
+            document.getElementById('activeHexes').textContent = (2847 + Math.floor(Math.random() * 100 - 50)).toLocaleString();
+            document.getElementById('totalTransactions').textContent = (1.2 + Math.random() * 0.1).toFixed(1) + 'M';
+            document.getElementById('uniqueClients').textContent = (485 + Math.floor(Math.random() * 20 - 10)).toLocaleString() + 'K';
+            document.getElementById('avgInterest').textContent = (1.23 + Math.random() * 0.1 - 0.05).toFixed(2);
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+                if (t.dataset.tab === tab) {
+                    t.classList.add('active');
+                }
+            });
+            
+            // Show/hide sections
+            document.getElementById('mapSection').style.display = tab === 'map' ? 'block' : 'none';
+            document.getElementById('statsGrid').style.display = tab === 'map' ? 'grid' : 'none';
+            document.getElementById('promoSection').style.display = tab === 'promo' ? 'block' : 'none';
+            document.getElementById('advantagesSection').style.display = tab === 'advantages' ? 'block' : 'none';
+            
+            // Update page header
+            const header = document.getElementById('pageHeader');
+            if (tab === 'map') {
+                header.style.display = 'block';
+                header.querySelector('.page-title').textContent = 'Карта клиентской активности';
+                header.querySelector('.page-subtitle').textContent = 'Аналитика по гексам на основе анонимизированных транзакций клиентов ВТБ';
+            } else if (tab === 'promo') {
+                header.style.display = 'none';
+            } else if (tab === 'advantages') {
+                header.style.display = 'block';
+                header.querySelector('.page-title').textContent = 'Конкурентные преимущества';
+                header.querySelector('.page-subtitle').textContent = 'Почему ВТБ ГеоАналитика — лучший выбор для вашего бизнеса';
+            }
+            
+            // Close hex panel when switching tabs
+            if (tab !== 'map') {
+                closeHexPanel();
+            }
+        }
+
+        // Event listeners
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        document.getElementById('categorySelect').addEventListener('change', refreshData);
+        document.getElementById('periodSelect').addEventListener('change', refreshData);
+        document.getElementById('hexSizeSelect').addEventListener('change', () => {
+            refreshData();
+            calculatePromo();
+        });
+        document.getElementById('promoPeriod').addEventListener('change', calculatePromo);
+        document.getElementById('promoBudget').addEventListener('input', calculatePromo);
+
+        // Initialize
+        generateHexGrid();
+        calculatePromo();
+    </script>
+</body>
+</html>
