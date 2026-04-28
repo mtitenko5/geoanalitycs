@@ -1,5 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icon issue in webpack/vite
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
 
 interface HexMapProps {
   category: string;
@@ -9,52 +20,62 @@ interface HexMapProps {
 
 interface HexData {
   id: string;
-  x: number;
-  y: number;
+  center: [number, number];
+  positions: [number, number][];
   activeInterest: number;
   atv: number;
   loyalty: number;
   marketShare: number;
 }
 
-// Generate hex grid data
-const generateHexGrid = (): HexData[] => {
+// Moscow bounds
+const MOSCOW_BOUNDS = {
+  north: 55.95,
+  south: 55.45,
+  east: 37.95,
+  west: 37.35,
+};
+
+// Generate hex grid over Moscow
+const generateHexGrid = (hexSizeKm: number = 0.9): HexData[] => {
   const hexes: HexData[] = [];
-  const cols = 24;
-  const rows = 18;
-  const hexWidth = 40;
-  const hexHeight = 35;
-
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const x = col * hexWidth + (row % 2 ? hexWidth / 2 : 0);
-      const y = row * hexHeight * 0.75;
-
+  
+  // Convert hex size to degrees (approximate)
+  const hexLatStep = (hexSizeKm / 111) * 1.5; // ~111km per degree latitude
+  const hexLngStep = (hexSizeKm / (111 * Math.cos(55.75 * Math.PI / 180))) * 1.5;
+  
+  let rowIndex = 0;
+  for (let lat = MOSCOW_BOUNDS.south; lat <= MOSCOW_BOUNDS.north; lat += hexLatStep) {
+    const isOddRow = rowIndex % 2 === 1;
+    const lngStart = isOddRow ? MOSCOW_BOUNDS.west + hexLngStep / 2 : MOSCOW_BOUNDS.west;
+    
+    let colIndex = 0;
+    for (let lng = lngStart; lng <= MOSCOW_BOUNDS.east; lng += hexLngStep) {
+      // Create hexagon coordinates
+      const positions: [number, number][] = [];
+      for (let i = 0; i < 6; i++) {
+        const angle = (i * 60 * Math.PI) / 180;
+        const dLat = hexLatStep * 0.5 * Math.sin(angle);
+        const dLng = hexLngStep * 0.5 * Math.cos(angle);
+        positions.push([lat + dLat, lng + dLng] as [number, number]);
+      }
+      
       hexes.push({
-        id: `hex-${row}-${col}`,
-        x,
-        y,
+        id: `hex-${rowIndex}-${colIndex}`,
+        center: [lat, lng],
+        positions,
         activeInterest: Math.floor(Math.random() * 100),
         atv: +(1 + Math.random() * 0.8).toFixed(2),
         loyalty: +(2 + Math.random() * 3).toFixed(1),
         marketShare: Math.floor(Math.random() * 40 + 10),
       });
+      
+      colIndex++;
     }
+    rowIndex++;
   }
-
+  
   return hexes;
-};
-
-// Hexagon path
-const getHexPath = (size: number = 30) => {
-  const angle = Math.PI / 3;
-  const points = [];
-  for (let i = 0; i < 6; i++) {
-    const x = size * Math.cos(angle * i);
-    const y = size * Math.sin(angle * i);
-    points.push(`${x},${y}`);
-  }
-  return `M ${points.join(' L ')} Z`;
 };
 
 const getHexColor = (activeInterest: number): string => {
@@ -65,110 +86,77 @@ const getHexColor = (activeInterest: number): string => {
 };
 
 export default function HexMap({ category, hexSize, onHexSelect }: HexMapProps) {
-  const [hexes] = useState(() => generateHexGrid());
+  const [hexes] = useState(() => generateHexGrid(hexSize / 1000));
   const [hoveredHex, setHoveredHex] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="relative bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100 h-[700px] flex items-center justify-center">
+        <div className="text-slate-500">Загрузка карты...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100 h-[700px] overflow-hidden">
-      {/* Map background with city grid */}
-      <div className="absolute inset-0 opacity-5">
-        <svg width="100%" height="100%">
-          <defs>
-            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#0079C1" strokeWidth="0.5" />
-            </pattern>
-            <pattern id="dotGrid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <circle cx="30" cy="30" r="1.5" fill="#0079C1" opacity="0.3" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          <rect width="100%" height="100%" fill="url(#dotGrid)" />
-        </svg>
-      </div>
-
-      {/* Decorative city landmarks */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-12 left-12 w-3 h-3 rounded-full bg-[#0079C1]/20 animate-pulse" />
-        <div className="absolute top-24 right-32 w-2 h-2 rounded-full bg-emerald-500/20 animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute bottom-32 left-24 w-2.5 h-2.5 rounded-full bg-violet-500/20 animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-16 right-16 w-3 h-3 rounded-full bg-amber-500/20 animate-pulse" style={{ animationDelay: '1.5s' }} />
-      </div>
-
-      {/* Hex Grid - scrollable container */}
-      <div className="absolute inset-0 overflow-auto p-8 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
-        <div className="min-w-max flex items-center justify-center">
-          <svg
-            width="1000"
-            height="650"
-            viewBox="0 0 1000 650"
-            className="drop-shadow-sm"
-          >
-            <defs>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-
-            {hexes.map((hex, index) => {
-              const isHovered = hoveredHex === hex.id;
-              const color = getHexColor(hex.activeInterest);
-
-              return (
-                <motion.g
-                  key={hex.id}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    delay: index * 0.001,
-                    type: 'spring',
-                    stiffness: 400,
-                    damping: 25,
-                  }}
-                  transform={`translate(${hex.x + 20}, ${hex.y + 20})`}
-                >
-                  <motion.path
-                    d={getHexPath(18)}
-                    fill={color}
-                    fillOpacity={isHovered ? 0.95 : 0.75}
-                    stroke={isHovered ? '#0079C1' : 'white'}
-                    strokeWidth={isHovered ? 2 : 1}
-                    className="cursor-pointer transition-all duration-150"
-                    filter={isHovered ? 'url(#glow)' : undefined}
-                    onMouseEnter={() => setHoveredHex(hex.id)}
-                    onMouseLeave={() => setHoveredHex(null)}
-                    onClick={() => onHexSelect(hex)}
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
-                  />
-
-                  {/* Show value on hover */}
-                  {isHovered && (
-                    <motion.text
-                      initial={{ opacity: 0, y: 3 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      x="0"
-                      y="3"
-                      textAnchor="middle"
-                      className="text-[10px] font-medium pointer-events-none"
-                      fill="#1e293b"
-                      style={{ fontWeight: 600 }}
-                    >
-                      {hex.activeInterest}%
-                    </motion.text>
-                  )}
-                </motion.g>
-              );
-            })}
-          </svg>
-        </div>
-      </div>
+    <div className="relative h-[700px]">
+      {/* Map with hex overlay */}
+      <MapContainer
+        center={[55.75, 37.61]} // Moscow center
+        zoom={10}
+        minZoom={9}
+        maxZoom={14}
+        scrollWheelZoom={true}
+        className="h-full w-full"
+        style={{ zIndex: 1 }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        
+        {hexes.map((hex) => {
+          const isHovered = hoveredHex === hex.id;
+          const color = getHexColor(hex.activeInterest);
+          
+          return (
+            <Polygon
+              key={hex.id}
+              positions={hex.positions}
+              pathOptions={{
+                fillColor: color,
+                fillOpacity: isHovered ? 0.8 : 0.6,
+                color: isHovered ? '#0079C1' : 'white',
+                weight: isHovered ? 3 : 1,
+              }}
+              eventHandlers={{
+                mouseover: () => setHoveredHex(hex.id),
+                mouseout: () => setHoveredHex(null),
+                click: () => onHexSelect(hex),
+              }}
+            >
+              <Popup>
+                <div className="p-2">
+                  <div className="font-semibold mb-2">Гекс {hex.id}</div>
+                  <div className="space-y-1 text-sm">
+                    <div>Активность: <strong>{hex.activeInterest}%</strong></div>
+                    <div>ATV: <strong>{hex.atv}</strong></div>
+                    <div>Лояльность: <strong>{hex.loyalty}</strong></div>
+                    <div>Доля рынка: <strong>{hex.marketShare}%</strong></div>
+                  </div>
+                </div>
+              </Popup>
+            </Polygon>
+          );
+        })}
+      </MapContainer>
 
       {/* Floating info */}
-      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none z-[1000]">
         <div className="px-4 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-xl text-xs text-slate-600">
           <span className="font-medium text-slate-900">{hexes.length}</span> гексов на карте
         </div>
@@ -179,7 +167,7 @@ export default function HexMap({ category, hexSize, onHexSelect }: HexMapProps) 
           </div>
 
           <div className="px-4 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-xl text-xs text-slate-500">
-            💡 Наведите на гекс для деталей
+            💡 Кликните на гекс для деталей
           </div>
         </div>
       </div>
